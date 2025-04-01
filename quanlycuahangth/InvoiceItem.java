@@ -1,9 +1,8 @@
 package quanlycuahangth;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 public class InvoiceItem {
     private String invoiceItemID;
@@ -44,8 +43,8 @@ public class InvoiceItem {
 
     public static boolean addProductToInvoice(String invoiceItemID, String invoiceID, String productID, double price, int quantity) {
         for (InvoiceItem item : invoiceItemsList) {
-            if (item.getInvoiceItemID().equals(invoiceItemID)) {
-                return false; // Invoice item ID already exists
+            if (item.invoiceItemID.equals(invoiceItemID)) {
+                return false;
             }
         }
         InvoiceItem newItem = new InvoiceItem(invoiceItemID, invoiceID, productID, price, quantity);
@@ -54,6 +53,27 @@ public class InvoiceItem {
     }
 
     public static boolean removeProductFromInvoice(String invoiceItemID) {
-        return invoiceItemsList.removeIf(item -> item.getInvoiceItemID().equals(invoiceItemID));
+        Iterator<InvoiceItem> it = invoiceItemsList.iterator();
+        while (it.hasNext()) {
+            InvoiceItem item = it.next();
+            if (item.invoiceItemID.equals(invoiceItemID)) {
+                it.remove();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean updateInvoiceItem(String invoiceItemID, String invoiceID, String productID, double price, int quantity) {
+        for (InvoiceItem item : invoiceItemsList) {
+            if (item.invoiceItemID.equals(invoiceItemID)) {
+                item.invoiceID = invoiceID;
+                item.productID = productID;
+                item.price = price;
+                item.quantity = quantity;
+                return true;
+            }
+        }
+        return false;
     }
 }

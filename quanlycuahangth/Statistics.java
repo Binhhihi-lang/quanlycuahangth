@@ -1,78 +1,93 @@
 package quanlycuahangth;
 
-import java.util.HashMap;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class Statistics {
 
     // Thống kê doanh thu theo khoảng thời gian
-    public static double revenueStatistics(String startDate, String endDate) {
-        if (startDate == null || endDate == null) {
-            throw new IllegalArgumentException("Start date and end date cannot be null");
-        }
-        double totalRevenue = 0;
-        List<Invoice> invoices = InvoiceManager.getInvoicesByDateRange(startDate, endDate);
+    public static double calculateRevenue(List<Invoice> invoices, LocalDate startDate, LocalDate endDate) {
+        double totalRevenue = 0.0;
         for (Invoice invoice : invoices) {
-            totalRevenue += invoice.getTotalAmount();
+            if (!invoice.getDate().isBefore(startDate) && !invoice.getDate().isAfter(endDate)) {
+                totalRevenue += invoice.getTotalAmount();
+            }
         }
         return totalRevenue;
     }
 
-    // Thống kê số lượng sản phẩm đã bán
-    public static Map<String, Integer> productStatistics() {
-        Map<String, Integer> productSales = new HashMap<>();
-        List<Invoice> invoices = InvoiceManager.getAllInvoices();
+    // Số lượng sản phẩm đã bán
+    public static int calculateTotalProductsSold(List<Invoice> invoices) {
+        int totalProductsSold = 0;
         for (Invoice invoice : invoices) {
             for (InvoiceItem item : invoice.getItems()) {
-                productSales.compute(item.getProductID(), (k, v) -> (v == null) ? item.getQuantity() : v + item.getQuantity());
+                totalProductsSold += item.getQuantity();
             }
         }
-        return productSales;
+        return totalProductsSold;
     }
 
-    // Thống kê số lượng sản phẩm tồn kho
-    public static Map<String, Integer> inventoryStatistics() {
-        Map<String, Integer> inventoryData = new HashMap<>();
-        List<Product> products = ProductManager.getAllProducts();
-        for (Product product : products) {
-            inventoryData.put(product.getProductID(), product.getStockQuantity());
+    // Sản phẩm bán chạy nhất
+    public static Product getBestSellingProduct(List<Invoice> invoices, List<Product> products) {
+        Map<String, Integer> productSales = new HashMap<>();
+        for (Invoice invoice : invoices) {
+            for (InvoiceItem item : invoice.getItems()) {
+                productSales.put(item.getProductID(), productSales.getOrDefault(item.getProductID(), 0) + item.getQuantity());
+            }
         }
-        return inventoryData;
+        String bestSellingProductID = null;
+        int maxSales = 0;
+        for (Map.Entry<String, Integer> entry : productSales.entrySet()) {
+            if (entry.getValue() > maxSales) {
+                maxSales = entry.getValue();
+                bestSellingProductID = entry.getKey();
+            }
+        }
+        for (Product product : products) {
+            if (product.getProductID().equals(bestSellingProductID)) {
+                return product;
+            }
+        }
+        return null;
     }
 
-    // Thống kê số lượng khách hàng
-    public static int customerStatistics() {
-        return CustomerManager.getAllCustomers().size();
+    // Số lượng khách hàng
+    public static int calculateTotalCustomers(List<Customer> customers) {
+        return customers.size();
     }
 
-    // Thống kê tổng số nhân viên
-    public static int employeeStatistics() {
-        return EmployeeManager.getAllEmployees().size();
+    // Tính tiền lương nhân viên
+    public static double calculateTotalEmployeeSalaries(List<Employee> employees) {
+        double totalSalaries = 0.0;
+        for (Employee employee : employees) {
+            totalSalaries += employee.getSalary();
+        }
+        return totalSalaries;
     }
 
-    // Thống kê tổng số lần nhập hàng theo nhà cung cấp
-    public static Map<String, Integer> supplierStatistics() {
+    // Tổng số lần nhập hàng theo nhà cung cấp
+    public static Map<String, Integer> calculateTotalOrdersBySupplier(List<PurchaseOrder> purchaseOrders) {
         Map<String, Integer> supplierOrders = new HashMap<>();
-        List<PurchaseOrder> orders = PurchaseOrderManager.getAllOrders();
-        for (PurchaseOrder order : orders) {
-            supplierOrders.compute(order.getSupplierID(), (k, v) -> (v == null) ? 1 : v + 1);
+        for (PurchaseOrder order : purchaseOrders) {
+            supplierOrders.put(order.getSupplierID(), supplierOrders.getOrDefault(order.getSupplierID(), 0) + 1);
         }
         return supplierOrders;
     }
 
-    // Thống kê lợi nhuận (Doanh thu - Chi phí nhập hàng)
-    public static double profitStatistics(String startDate, String endDate) {
-        if (startDate == null || endDate == null) {
-            throw new IllegalArgumentException("Start date and end date cannot be null");
+    // Tổng số nhà cung cấp
+    public static int calculateTotalSuppliers(List<Supplier> suppliers) {
+        return suppliers.size();
+    }
+
+    // Tính lợi nhuận (Doanh thu - Chi phí nhập hàng)
+    public static double calculateProfit(List<Invoice> invoices, List<PurchaseOrder> purchaseOrders) {
+        double totalRevenue = calculateRevenue(invoices, LocalDate.MIN, LocalDate.MAX);
+        double totalCost = 0.0;
+        for (PurchaseOrder order : purchaseOrders) {
+            totalCost += order.getTotalAmount();
         }
-        double revenue = revenueStatistics(startDate, endDate);
-        double totalCost = 0;
-        List<PurchaseOrder> orders = PurchaseOrderManager.getOrdersByDateRange(startDate, endDate);
-        for (PurchaseOrder order : orders) {
-            totalCost += order.getTotalCost();
-        }
-        return revenue - totalCost;
+        return totalRevenue - totalCost;
     }
 }

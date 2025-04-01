@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Employee {
+public class Employee extends SystemUser {
     private String employeeID;
     private String name;
     private String phone;
@@ -13,14 +13,43 @@ public class Employee {
     private double salary;
     private String workShift;
 
-    public Employee(String employeeID, String name, String phone, String email, String address, double salary, String workShift) {
+    public Employee(String userID, String username, String password, String employeeID, String name, String email, String address, String phone, double salary, String workShift) {
+        super(userID, username, password);
         this.employeeID = employeeID;
         this.name = name;
-        this.phone = phone;
         this.email = email;
         this.address = address;
+        this.phone = phone;
         this.salary = salary;
         this.workShift = workShift;
+    }
+
+    public String getEmployeeID() {
+        return employeeID;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    public String getWorkShift() {
+        return workShift;
     }
 
     public static List<Employee> employeelist = new ArrayList<>();
@@ -28,12 +57,10 @@ public class Employee {
     public static boolean addEmployee(Employee employee) {
         for (Employee e : employeelist) {
             if (e.employeeID.equals(employee.employeeID)) {
-                System.out.println("Nhân viên đã tồn tại:" + employee.employeeID);
                 return false;
             }
         }
         employeelist.add(employee);
-        System.out.println("Thêm nhân viên thành công:" + employee.employeeID);
         return true;
     }
 
@@ -47,11 +74,9 @@ public class Employee {
                 e.address = address;
                 e.salary = salary;
                 e.workShift = workShift;
-                System.out.println("Cập nhật thông tin nhân viên thành công:" + employeeID);
                 return true;
             }
         }
-        System.out.println("Không tìm thấy nhân viên :" + employeeID);
         return false;
     }
 
@@ -59,13 +84,11 @@ public class Employee {
         List<Employee> result = new ArrayList<>();
         for (Employee e : employeelist) {
             if (e.employeeID.equals(employeeID)) {
-                System.out.println("Đã tìm thấy nhân viên :");
                 result.add(e);
-            } else {
-                System.out.println("Không tìm thấy nhân viên" + employeeID);
+                return result;
             }
         }
-        return result;
+        return null;
     }
 
     public static boolean deleteEmployee(String employeeID) {
@@ -74,11 +97,9 @@ public class Employee {
             Employee e = it.next();
             if (e.employeeID.equals(employeeID)) {
                 it.remove();
-                System.out.println("Xóa nhân viên thành công" + employeeID);
                 return true;
             }
         }
-        System.out.println("Không tìm thấy nhân viên:" + employeeID);
         return false;
     }
 

@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public class SystemUser {
-    private String userID;
-    private String username;
-    private String password;
+    protected String userID;
+    protected String username;
+    protected String password;
 
     // Giả lập danh sách người dùng (database)
     private static List<SystemUser> userList = new ArrayList<>();
@@ -16,6 +16,14 @@ public class SystemUser {
         this.userID = userID;
         this.username = username;
         this.password = password;
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     // Kiểm tra đăng nhập
@@ -77,14 +85,5 @@ public class SystemUser {
         }
         System.out.println("Không tìm thấy userID: " + userID);
         return false;
-    }
-
-    // Getters
-    public String getUserID() {
-        return userID;
-    }
-
-    public String getUsername() {
-        return username;
     }
 }

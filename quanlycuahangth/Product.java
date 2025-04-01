@@ -9,17 +9,17 @@ public class Product {
     private String productID;
     private String name;
     private double price;
-    private int stockQuantity;
+    private String desciption;
     private String categoryID;
 
     private static List<Product> productList = new ArrayList<>();
 
-    public Product(String productID, String name, double price, int stockQuantity, String categoryID) {
+    public Product(String productID, String name, double price, int stockQuantity, String description, String categoryID) {
         this.productID = productID;
         this.name = name;
         this.price = price;
-        this.stockQuantity = stockQuantity;
         this.categoryID = categoryID;
+        this.desciption = description;
     }
 
     public String getProductID() {
@@ -34,37 +34,34 @@ public class Product {
         return price;
     }
 
-    public int getStockQuantity() {
-        return stockQuantity;
-    }
-
     public String getCategoryID() {
         return categoryID;
+    }
+
+    public String getDesciption() {
+        return desciption;
     }
 
     public static boolean addProduct(Product product) {
         for (Product p : productList) {
             if (p.productID.equals(product.productID)) {
-                System.out.println("Sản phẩm đã tồn tại" + p.productID);
                 return false;
             }
         }
         productList.add(product);
-        System.out.println("Đã thêm sản phẩm thành công");
         return true;
     }
 
-    public static boolean updateProduct(String productID, String name, double price, int stockQuantity) {
+    public static boolean updateProduct(String productID, String name, double price, String desciption, String categoryID) {
         for (Product p : productList) {
             if (p.productID.equals(productID)) {
                 p.name = name;
                 p.price = price;
-                p.stockQuantity = stockQuantity;
-                System.out.println("Cập nhật sản phẩm thành công");
+                p.desciption = desciption;
+                p.categoryID = categoryID;
                 return true;
             }
         }
-        System.out.println("Không tìm thấy sản phẩm");
         return false;
     }
 
@@ -74,11 +71,9 @@ public class Product {
             Product p = iterator.next();
             if (p.productID.equals(productID)) {
                 iterator.remove();
-                System.out.println("Đã xóa thành công sản phẩm");
                 return true;
             }
         }
-        System.out.println("Không tìm thấy sản phẩm");
         return false;
     }
 
@@ -87,12 +82,10 @@ public class Product {
         for (Product p : productList) {
             if (p.productID.equals(productID)) {
                 result.add(p);
-                System.out.println("Đã tìm thấy sản phẩm");
-            } else {
-                System.out.println("không tìm thấy sản phẩm" + productID);
+                return result;
             }
         }
-        return result;
+        return null;
     }
 
     public static List<Product> listProducts() {

@@ -2,6 +2,7 @@ package quanlycuahangth;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Invoice {
@@ -10,6 +11,7 @@ public class Invoice {
     private String employeeID;
     private LocalDate date;
     private double totalAmount;
+    private List<InvoiceItem> items;
 
     private static List<Invoice> invoiceList = new ArrayList<>();
 
@@ -19,6 +21,7 @@ public class Invoice {
         this.employeeID = employeeID;
         this.date = date;
         this.totalAmount = totalAmount;
+        this.items = new ArrayList<>();
     }
 
     public String getInvoiceID() {
@@ -41,10 +44,20 @@ public class Invoice {
         return totalAmount;
     }
 
+    public List<InvoiceItem> getItems() {
+        return items;
+    }
+
+    // tạo 1 mục mới để tạo ra hóa đơn mới áp dụng thuế hoặc khuyến mãi
+    public void addItem(InvoiceItem item) {
+        items.add(item);
+        totalAmount += item.getPrice() * item.getQuantity();
+    }
+
     public static boolean createInvoice(String invoiceID, String customerID, String employeeID, double totalAmount, LocalDate date) {
         for (Invoice invoice : invoiceList) {
             if (invoice.getInvoiceID().equals(invoiceID)) {
-                return false; // Invoice ID already exists
+                return false;
             }
         }
         Invoice newInvoice = new Invoice(invoiceID, customerID, employeeID, date, totalAmount);
@@ -52,54 +65,50 @@ public class Invoice {
         return true;
     }
 
-    public static boolean searchInvoice(String invoiceID) {
-        for (Invoice invoice : invoiceList) {
-            if (invoice.getInvoiceID().equals(invoiceID)) {
+    public static List<Invoice> searchInvoice(String invoiceID) {
+        List<Invoice> result = new ArrayList<>();
+        for (Invoice i : invoiceList) {
+            if (i.invoiceID.equals(invoiceID)) {
+                result.add(i);
+                return result;
+            }
+        }
+        return null;
+    }
+
+    public static boolean deleteInvoice(String invoiceID) {
+        Iterator<Invoice> it = invoiceList.iterator();
+        while (it.hasNext()) {
+            Invoice invoice = it.next();
+            if (invoice.invoiceID.equals(invoiceID)) {
+                it.remove();
                 return true;
             }
         }
         return false;
     }
 
-    public static boolean deleteInvoice(String invoiceID) {
-        return invoiceList.removeIf(invoice -> invoice.getInvoiceID().equals(invoiceID));
-    }
-
     public static void printInvoice(String invoiceID) {
         for (Invoice invoice : invoiceList) {
-            if (invoice.getInvoiceID().equals(invoiceID)) {
-                System.out.println("Invoice ID: " + invoice.getInvoiceID());
-                System.out.println("Customer ID: " + invoice.getCustomerID());
-                System.out.println("Employee ID: " + invoice.getEmployeeID());
-                System.out.println("Date: " + invoice.getDate());
-                System.out.println("Total Amount: " + invoice.getTotalAmount());
+            if (invoice.invoiceID.equals(invoiceID)) {
+                System.out.println("Invoice ID: " + invoice.invoiceID);
+                System.out.println("Customer ID: " + invoice.customerID);
+                System.out.println("Employee ID: " + invoice.employeeID);
+                System.out.println("Date: " + invoice.date);
+                System.out.println("Total Amount: " + invoice.totalAmount);
+                System.out.println("Items:");
+                for (InvoiceItem item : invoice.getItems()) {
+                    System.out.println("  Product ID: " + item.getProductID());
+                    System.out.println("  Price: " + item.getPrice());
+                    System.out.println("  Quantity: " + item.getQuantity());
+                }
                 return;
             }
         }
-        System.out.println("Invoice not found.");
+        System.out.println("Hóa đơn không tồn tại");
     }
 
-    public static List<Invoice> getAllInvoices() {
+    public static List<Invoice> listInvoices() {
         return new ArrayList<>(invoiceList);
-    }
-
-    public static List<Customer> getTopCustomer() {
-        // Assuming a method to get top customers based on the amount spent
-        // This is a placeholder implementation
-        List<Customer> customers = CustomerManager.getAllCustomers();
-        customers.sort((c1, c2) -> Double.compare(getTotalSpentByCustomer(c2.getCustomerID()), getTotalSpentByCustomer(c1.getCustomerID())));
-        return customers.subList(0, Math.min(5, customers.size())); // Return top 5 customers
-    }
-
-    public static double getTotalRevenue() {
-        return invoiceList.stream().mapToDouble(Invoice::getTotalAmount).sum();
-    }
-
-    private static double getTotalSpentByCustomer(String customerID) {
-        // Placeholder implementation to calculate total amount spent by a customer
-        return invoiceList.stream()
-                .filter(invoice -> invoice.getCustomerID().equals(customerID))
-                .mapToDouble(Invoice::getTotalAmount)
-                .sum();
     }
 }

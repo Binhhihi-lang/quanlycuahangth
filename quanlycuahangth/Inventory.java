@@ -3,7 +3,7 @@ package quanlycuahangth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
-import java.time.*;
+import java.time.LocalDate;
 
 public class Inventory {
     // Giả lập kho hàng bằng Map: key = productID, value = Inventory object
@@ -19,6 +19,18 @@ public class Inventory {
         this.expirationDate = expirationDate;
     }
 
+    public String getProductID() {
+        return productID;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public LocalDate getExpirationDate() {
+        return expirationDate;
+    }
+
     // Kiểm tra tồn kho của sản phẩm
     public static boolean checkStock(String productID) {
         Inventory inv = inventoryMap.get(productID);
@@ -26,33 +38,50 @@ public class Inventory {
             System.out.println("Sản phẩm " + productID + " còn tồn: " + inv.quantity);
             return true;
         }
-        System.out.println("Sản phẩm " + productID + " không còn hàng.");
+//        System.out.println("Sản phẩm " + productID + " không còn hàng.");
         return false;
     }
 
-    // Cập nhật tồn kho: tăng số lượng lên (với nhập hàng) hoặc giảm khi bán
-    public static boolean updateInventory(String productID, int addQuantity) {
+    // Nhập hàng về thêm sản phẩm vào kho
+    public static boolean addProductToInventory(String productID, int addQuantity, LocalDate expirationDate) {
         Inventory inv = inventoryMap.get(productID);
         if (inv == null) {
-            // Nếu chưa có, tạo mới với expirationDate mặc định (ví dụ 1 năm sau)
-            inv = new Inventory(productID, addQuantity, LocalDate.now().plusYears(1));
+            inv = new Inventory(productID, addQuantity, expirationDate);
             inventoryMap.put(productID, inv);
         } else {
             inv.quantity += addQuantity;
         }
-        System.out.println("Cập nhật kho: sản phẩm " + productID + " có số lượng mới: " + inventoryMap.get(productID).quantity);
         return true;
     }
 
     // Xuất hàng (giảm số lượng khi bán)
-    public static boolean removeStock(String productID, int removeQuantity) {
+    public static boolean reduceQuantityOfProductFromInventory(String productID, int reduceQuantity) {
         Inventory inv = inventoryMap.get(productID);
-        if (inv != null && inv.quantity >= removeQuantity) {
-            inv.quantity -= removeQuantity;
-            System.out.println("Xuất hàng thành công: " + productID + " còn lại " + inv.quantity);
+        if (inv != null && inv.quantity >= reduceQuantity) {
+            inv.quantity -= reduceQuantity;
             return true;
         }
-        System.out.println("Xuất hàng thất bại: Không đủ số lượng tồn kho.");
+//        System.out.println("Xuất hàng thất bại: Không đủ số lượng tồn kho.");
+        return false;
+    }
+
+    // Xóa mặt hàng trong kho
+    public static boolean removeProductInInventory(String productID) {
+        if (inventoryMap.containsKey(productID)) {
+            inventoryMap.remove(productID);
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean updateProductInInventory(String productID, int quantity, LocalDate expirationDate) {
+        Inventory inv = inventoryMap.get(productID);
+        if (inv != null) {
+            inv.productID = productID;
+            inv.quantity = quantity;
+            inv.expirationDate = expirationDate;
+            return true;
+        }
         return false;
     }
 
@@ -79,23 +108,9 @@ public class Inventory {
 
     // Hiển thị toàn bộ sản phẩm trong kho
     public static void displayInventory() {
-        System.out.println("===== DANH SÁCH TỒN KHO =====");
         for (Inventory inv : inventoryMap.values()) {
             System.out.println("Sản phẩm: " + inv.productID + " | Số lượng: " + inv.quantity + " | Hạn sử dụng: " + inv.expirationDate);
         }
-        System.out.println("=============================");
     }
 
-    // Getters
-    public String getProductID() {
-        return productID;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public LocalDate getExpirationDate() {
-        return expirationDate;
-    }
 }

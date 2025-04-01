@@ -31,12 +31,10 @@ public class Supplier {
     public static boolean addSupplier(Supplier supplier) {
         for (Supplier s : supplierList) {
             if (s.supplierID.equals(supplier.supplierID)) {
-                System.out.println("Nhà cung cấp đã tồn tại: " + supplier.supplierID);
                 return false;
             }
         }
         supplierList.add(supplier);
-        System.out.println("Thêm nhà cung cấp thành công: " + supplier.name);
         return true;
     }
 
@@ -48,11 +46,9 @@ public class Supplier {
                 s.phone = phone;
                 s.email = email;
                 s.address = address;
-                System.out.println("Cập nhật nhà cung cấp thành công: " + supplierID);
                 return true;
             }
         }
-        System.out.println("Không tìm thấy nhà cung cấp: " + supplierID);
         return false;
     }
 
@@ -63,11 +59,9 @@ public class Supplier {
             Supplier s = iterator.next();
             if (s.supplierID.equals(supplierID)) {
                 iterator.remove();
-                System.out.println("Xóa nhà cung cấp thành công: " + supplierID);
                 return true;
             }
         }
-        System.out.println("Không tìm thấy nhà cung cấp: " + supplierID);
         return false;
     }
 
@@ -75,10 +69,7 @@ public class Supplier {
         List<Supplier> result = new ArrayList<>();
         for (Supplier s : supplierList) {
             if (s.supplierID.equals(supplierID)) {
-                System.out.println("Đã tìm thấy nhà cung cấp");
                 result.add(s);
-            } else {
-                System.out.println("Không tìm thấy nhà cung cấp" + supplierID);
             }
         }
         return result;
